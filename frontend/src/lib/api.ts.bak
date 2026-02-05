@@ -1,0 +1,102 @@
+import type { CreateListingInput, EmailTemplate, Listing, UpdateEmailTemplateInput } from "@/lib/types";
+
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") ||
+  "http://localhost:8000";
+
+async function readJson<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`API ${res.status}: ${text || res.statusText}`);
+  }
+  return (await res.json()) as T;
+}
+
+export async function fetchListings(): Promise<Listing[]> {
+  const res = await fetch(`${apiBaseUrl}/api/listings`, { cache: "no-store" });
+  const json = await readJson<{ data: Listing[] }>(res);
+  return json.data;
+}
+
+export async function fetchListing(slug: string): Promise<Listing> {
+  const res = await fetch(`${apiBaseUrl}/api/listings/${slug}`, {
+    cache: "no-store",
+  });
+  const json = await readJson<{ data: Listing }>(res);
+  return json.data;
+}
+
+export async function createListing(input: CreateListingInput) {
+  const res = await fetch(`${apiBaseUrl}/api/listings`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  const json = await readJson<{ data: Listing }>(res);
+  return json.data;
+}
+
+export async function placeBid(
+  slug: string,
+  bidderEmail: string,
+  amountCents: number,
+) {
+  const res = await fetch(`${apiBaseUrl}/api/listings/${slug}/bids`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ bidder_email: bidderEmail, amount_cents: amountCents }),
+  });
+
+  const json = await readJson<{ data: unknown }>(res);
+  return json.data;
+}
+
+export async function adminFetchListings(
+  status: "pending" | "approved" | "rejected",
+  adminToken: string,
+): Promise<Listing[]> {
+  const res = await fetch(`${apiBaseUrl}/api/admin/listings?status=${status}`, {
+    cache: "no-store",
+    headers: {
+      "X-Admin-Token": adminToken,
+    },
+  });
+
+  const json = await readJson<{ data: Listing[] }>(res);
+  return json.data;
+}
+
+export async function adminApproveListing(id: number, adminToken: string) {
+  const res = await fetch(`${apiBaseUrl}/api/admin/listings/${id}/approve`, {
+    method: "POST",
+    headers: {
+      "X-Admin-Token": adminToken,
+    },
+  });
+
+  const json = await readJson<{ data: Listing }>(res);
+  return json.data;
+}
+
+export async function adminRejectListing(
+  id: number,
+  reason: string,
+  adminToken: string,
+) {
+  const res = await fetch(`${apiBaseUrl}/api/admin/listings/${id}/reject`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Admin-Token": adminToken,
+    },
+    body: JSON.stringify({ reason }),
+  });
+
+  const json = await readJson<{ data: Listing }>(res);
+  return json.data;
+}
