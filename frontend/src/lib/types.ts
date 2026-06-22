@@ -63,3 +63,54 @@ export type User = {
   role: string;
   created_at: string;
 };
+
+export type Review = {
+  id: number;
+  reviewer_id: number;
+  seller_id: number;
+  product_id: number | null;
+  rating: number; // 1-5
+  comment: string | null;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+  reviewer?: {
+    id: number;
+    name: string;
+    email?: string;
+  };
+  seller?: {
+    id: number;
+    name: string;
+    email?: string;
+  };
+  product?: {
+    id: number;
+    title: string;
+    slug: string;
+  };
+};
+
+export type ReviewStats = {
+  average_rating: number;
+  total_reviews: number;
+  rating_distribution: {
+    5: number;
+    4: number;
+    3: number;
+    2: number;
+    1: number;
+  };
+};
+
+export type CreateReviewInput = {
+  seller_id: number;
+  product_id?: number | null;
+  rating: number;
+  comment?: string;
+};
+
+export type UpdateReviewInput = {
+  rating?: number;
+  comment?: string;
+};

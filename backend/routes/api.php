@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ListingController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', fn () => ['ok' => true]);
@@ -43,6 +44,17 @@ Route::post('/listings/{product:slug}/buy-now', [BuyNowController::class, 'purch
 // Payment routes
 Route::get('/payment/{slug}', [PaymentController::class, 'getPaymentInfo']);
 Route::post('/payment', [PaymentController::class, 'processPayment']);
+
+// Reviews - Public routes
+Route::get('/sellers/{seller}/reviews', [ReviewController::class, 'index']); // عرض تقييمات بائع
+Route::get('/sellers/{seller}/reviews/summary', [ReviewController::class, 'sellerSummary']); // ملخص التقييمات
+
+// Reviews - Protected routes (requires authentication)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/reviews', [ReviewController::class, 'store']); // إضافة تقييم جديد
+    Route::put('/reviews/{review}', [ReviewController::class, 'update']); // تحديث تقييم
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']); // حذف تقييم
+});
 
 // Admin review/moderation
 Route::prefix('admin')->middleware('admin')->group(function () {

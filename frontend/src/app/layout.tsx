@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   description: "موقع مزاد: نشر منتج + مزايدة + مراجعة من admin (Laravel + Next.js)",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

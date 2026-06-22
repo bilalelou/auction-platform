@@ -39,7 +39,7 @@ export default function RegisterPage() {
     try {
       const session = await registerUser({ name, email, password });
       saveSession(session);
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "فشل في التسجيل");
       setIsSubmitting(false);

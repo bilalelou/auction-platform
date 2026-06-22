@@ -33,7 +33,7 @@ export default function LoginPage() {
     try {
       const session = await loginUser({ email, password });
       saveSession(session);
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "فشل في تسجيل الدخول");
       setIsSubmitting(false);

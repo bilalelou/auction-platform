@@ -25,15 +25,16 @@ class BuyNowController extends Controller
         ]);
 
         // Create a payment record for the buy now purchase
+        // Using bidder_email for buyer since we're reusing the existing payment structure
         $payment = Payment::create([
-            'user_id' => $request->user()?->id,
             'product_id' => $product->id,
+            'bid_id' => null, // No bid for Buy Now purchases
+            'bidder_email' => $data['buyer_email'], // Store buyer email in bidder_email field
             'amount_cents' => $product->buy_now_price_cents,
             'currency' => $product->currency,
             'status' => 'pending',
-            'payment_method' => 'buy_now',
-            'buyer_email' => $data['buyer_email'],
-            'buyer_name' => $data['buyer_name'] ?? null,
+            'payment_method' => 'cod', // COD represents buy_now purchase for now
+            'notes' => 'Buy Now purchase' . ($data['buyer_name'] ? ' by ' . $data['buyer_name'] : ''),
         ]);
 
         // Mark product as sold
